@@ -1,0 +1,50 @@
+{
+  "name": "n3-match-bgp",
+  "version": "0.1.0",
+  "description": "Matches basic graph patterns against an N3.js Store or any RDF/JS dataset, yielding RDF/JS Bindings",
+  "keywords": [
+    "rdf",
+    "rdfjs",
+    "n3",
+    "bgp",
+    "basic graph pattern",
+    "sparql",
+    "bindings"
+  ],
+  "license": "MIT",
+  "author": "Jesse Wright",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jeswr/n3-match-bgp.git"
+  },
+  "bugs": "https://github.com/jeswr/n3-match-bgp/issues",
+  "homepage": "https://github.com/jeswr/n3-match-bgp#readme",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./src/index.js"
+    }
+  },
+  "types": "./index.d.ts",
+  "files": [
+    "src",
+    "index.d.ts"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "@rdfjs/types": "^2.0.1"
+  },
+  "peerDependencies": {
+    "n3": "^2.0.0 || ^3.0.0-0"
+  },
+  "devDependencies": {
+    "n3": "^2.13.0"
+  }
+}
