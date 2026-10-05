@@ -3,9 +3,12 @@ on:
   push:
     branches: [main]
   pull_request:
+permissions:
+  contents: read
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  # Never cancel a run on main, which may be publishing a release
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -22,3 +25,30 @@ jobs:
       - run: npm install --no-save n3@${{ matrix.n3 }}
       - run: npm test
       - run: npx -p typescript tsc --noEmit --strict index.d.ts
+
+  release:
+    # Publishes to npm through trusted publishing (OIDC), so there is no npm token.
+    # On npmjs.com the package's trusted publisher names this file, ci.yml.
+    if: github.repository == 'jeswr/n3-match-bgp' && github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      # Trusted publishing needs npm >= 11.5.1, which Node 24 ships
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm ci
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        # The conventionalcommits preset reads `feat!:` titles as breaking.
+        # Preset v10 needs conventional-changelog-writer 9; semantic-release 25 loads 8.
+        run: npx -p semantic-release@25 -p conventional-changelog-conventionalcommits@9 semantic-release
